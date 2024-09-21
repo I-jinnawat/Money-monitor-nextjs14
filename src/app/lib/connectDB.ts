@@ -1,7 +1,7 @@
 import mongoose from"mongoose";
 
 const DB =
-	"mongodb://127.0.0.1:27017/";
+	" mongodb+srv://6431503083:art999@cluster0.5oomu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const connectDB = async () => {
 	console.log("connecting DB...");
