@@ -11,47 +11,102 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button"; // Assuming you have a button component
+import EditTransactionModal from "@/components/EditTransactionModal"; // A modal component for editing
 
 const TableTransaction = () => {
     const [data, setData] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedMonth, setSelectedMonth] = useState<string>(() => {
-        // Default to the current month on first render
         const now = new Date();
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     });
 
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null); // For updating
+    const [isEditing, setIsEditing] = useState(false); // Modal open/close state
+
+    // Fetch transactions
     const getTransaction = async (month: string) => {
         try {
             setLoading(true);
             setError(null);
-
-            const response = await fetch(`/api/transactions?month=${month}`); // Pass month as query param
+            const response = await fetch(`/api/transactions?month=${month}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch transactions");
             }
             const transactionData = await response.json();
-
             setData(transactionData);
-        } catch (error: any) {
-            console.error("Failed to fetch transactions:", error);
-            setError(error.message);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Failed to fetch transactions:", error.message);
+                setError(error.message);
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch transactions whenever the selected month changes
+    // Update a transaction
+    const handleUpdateTransaction = async (updatedTransaction: Transaction) => {
+        try {
+            const response = await fetch(`/api/transactions/${updatedTransaction._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedTransaction),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update transaction");
+            }
+
+            // Update the transaction in the state
+            setData((prevData) =>
+                prevData.map((transaction) =>
+                    transaction._id === updatedTransaction._id ? updatedTransaction : transaction
+                )
+            );
+
+            setIsEditing(false); // Close modal after update
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Failed to update transactions:", error.message);
+                setError(error.message);
+            }
+        }
+    };
+
+    // Delete a transaction
+    const handleDeleteTransaction = async (transactionId: string) => {
+        try {
+            const response = await fetch(`/api/transactions/${transactionId}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to delete transaction");
+            }
+
+            // Remove the deleted transaction from the state
+            setData((prevData) => prevData.filter((transaction) => transaction._id !== transactionId));
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Failed to delete transactions:", error.message);
+                setError(error.message);
+            }
+        }
+    };
+
     useEffect(() => {
-        const month = selectedMonth.split("-")[1]; // Extract the month (MM)
+        const month = selectedMonth.split("-")[1];
         getTransaction(month);
     }, [selectedMonth]);
 
     return (
         <div className="bg-gray-50 py-5 px-5 rounded-md shadow-md container mx-auto">
             <header>
-                {/* Month Picker */}
                 <label htmlFor="monthPicker" className="mr-2">
                     Select Month:
                 </label>
@@ -59,7 +114,7 @@ const TableTransaction = () => {
                     type="month"
                     id="monthPicker"
                     value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)} // Update selected month
+                    onChange={(e) => setSelectedMonth(e.target.value)}
                     className="bg-white cursor-pointer p-2 mb-4"
                 />
             </header>
@@ -80,22 +135,49 @@ const TableTransaction = () => {
                                 <TableHead>Type</TableHead>
                                 <TableHead>Date</TableHead>
                                 <TableHead className="text-right">Amount</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {data.map((transaction) => (
-                                <TableRow key={transaction._id}> {/* Add unique key */}
+                                <TableRow key={transaction._id}>
                                     <TableCell>{transaction._id}</TableCell>
                                     <TableCell>{transaction.title}</TableCell>
                                     <TableCell>{transaction.type}</TableCell>
                                     <TableCell>{transaction.date}</TableCell>
                                     <TableCell className="text-right">${transaction.amount}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Button
+                                            onClick={() => {
+                                                setSelectedTransaction(transaction);
+                                                setIsEditing(true);
+                                            }}
+                                            className="mr-2"
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() => handleDeleteTransaction(transaction._id)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 )}
             </main>
+
+            {/* Modal for Editing */}
+            {isEditing && selectedTransaction && (
+                <EditTransactionModal
+                    transaction={selectedTransaction}
+                    onSave={handleUpdateTransaction}
+                    onClose={() => setIsEditing(false)}
+                />
+            )}
         </div>
     );
 };

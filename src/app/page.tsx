@@ -1,5 +1,4 @@
 import TransactionForm from '@/components/transactionForm'
-import Table from '@/components/table'
 import connectDB from '@/app/lib/connectDB'
 import Summary from '@/app/summary-monthly/page'
 import TableSummary from '@/app/table-transactions/page'

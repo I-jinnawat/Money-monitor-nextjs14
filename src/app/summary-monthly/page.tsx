@@ -4,11 +4,6 @@ import { ReportData } from '@/app/types/index'
 import { Input } from "@/components/ui/input";
 
 const Summary = () => {
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const currentDate = new Date();
-    let currentMonth = currentDate.getMonth();
-    let currentYear = currentDate.getFullYear();
-    let monthName = months[currentDate.getMonth()];
 
     const [report, setReport] = useState<ReportData>()
     const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -27,8 +22,10 @@ const Summary = () => {
                 }
                 const data = await res.json()
                 setReport(data.summary)
-            } catch (e: any) {
-                console.error(e.message)
+            } catch (e: unknown) {
+                if (e instanceof Error) {
+                    console.error("Failed to fetch transactions:", e.message);
+                }
             } finally {
                 setIsLoading(false)
             }

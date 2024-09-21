@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Link from "next/link"
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +30,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <nav>
-          {/* <Link href={'/'}>back</Link> */}
           <h1 className="text-2xl md:text-5xl text-center font-bold py-5">Money Monitor</h1>
         </nav>
         {children}

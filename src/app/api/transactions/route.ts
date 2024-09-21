@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       month = (currentDate.getMonth() + 1).toString(); // getMonth() returns 0-indexed, so we add 1
     }
 
-    let query = {
+    const query = {
       $expr: {
         $eq: [
           { $month: { $dateFromString: { dateString: "$date" } } }, 
@@ -25,9 +25,11 @@ export async function GET(request: Request) {
     const transactions = await TransactionModel.find(query).exec();;
 
     return NextResponse.json(transactions, { status: 200 });
-  } catch (e: any) {
-    console.error(e.message);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+                console.error("Failed to fetch transactions:", e.message);
+                return NextResponse.json({ error: e.message }, { status: 500 });
+            }
   }
 }
 

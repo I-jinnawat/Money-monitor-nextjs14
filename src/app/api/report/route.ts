@@ -11,7 +11,7 @@ export async function GET(request: Request) {
             month = (currenDate.getMonth() + 1).toString()
         }
 
-        let query = {
+        const query = {
         $expr: {
             $eq: [
             { $month: { $dateFromString: { dateString: "$date" } } }, 
@@ -45,8 +45,11 @@ export async function GET(request: Request) {
                 status: 200,
             })
 		
-    } catch (e:any) {
-        console.error(e.message);
+    } catch (e) {
+          if (e instanceof Error) {
+            console.error(e.message);
         return NextResponse.json({ message: 'An error occurred' }, { status: 500 });
+            }
+        
     }
 }
