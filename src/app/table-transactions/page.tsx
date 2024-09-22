@@ -31,7 +31,7 @@ const TableTransaction = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch(`/api/transactions?month=${month}`);
+            const response = await fetch(`https://money-monitor-nextjs14.vercel.app/api/transactions?month=${month}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch transactions");
             }
