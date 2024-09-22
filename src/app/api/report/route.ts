@@ -11,14 +11,15 @@ export async function GET(request: Request) {
             month = (currenDate.getMonth() + 1).toString()
         }
 
-        const query = {
-        $expr: {
-            $eq: [
-            { $month: { $dateFromString: { dateString: "$date" } } }, 
-            parseInt(month)
-            ]
-        }
-        };
+      const query = {
+			dateOfused: { $exists: true, $ne: "" },
+			$expr: {
+				$eq: [
+					{ $month: { $dateFromString: { dateString: "$dateOfused" } } },
+					parseInt(month),
+				],
+			},
+		};
 
         const transactions = await TransactionModel.find(query).exec();
 

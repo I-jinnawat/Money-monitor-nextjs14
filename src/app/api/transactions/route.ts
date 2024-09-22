@@ -14,15 +14,16 @@ export async function GET(request: Request) {
     }
 
     const query = {
-      $expr: {
-        $eq: [
-          { $month: { $dateFromString: { dateString: "$date" } } }, 
-          parseInt(month)
-        ]
-      }
+			dateOfused: { $exists: true, $ne: "" },
+			$expr: {
+				$eq: [
+					{ $month: { $dateFromString: { dateString: "$dateOfused" } } },
+					parseInt(month),
+				],
+			},
     };
 
-    const transactions = await TransactionModel.find(query).exec();;
+    const transactions = await TransactionModel.find(query).exec();
 
     return NextResponse.json(transactions, { status: 200 });
   } catch (e: unknown) {
