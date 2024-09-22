@@ -31,7 +31,9 @@ const TableTransaction = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch(`https://money-monitor-nextjs14.vercel.app/api/transactions?month=${month}`);
+            // Example: Accessing the API URL from env variables
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions?month=${month}`);
+
             if (!response.ok) {
                 throw new Error("Failed to fetch transactions");
             }
@@ -50,7 +52,7 @@ const TableTransaction = () => {
     // Update a transaction
     const handleUpdateTransaction = async (updatedTransaction: Transaction) => {
         try {
-            const response = await fetch(`/api/transactions/${updatedTransaction._id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${updatedTransaction._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -81,7 +83,7 @@ const TableTransaction = () => {
     // Delete a transaction
     const handleDeleteTransaction = async (transactionId: string) => {
         try {
-            const response = await fetch(`/api/transactions/${transactionId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${transactionId}`, {
                 method: "DELETE",
             });
 

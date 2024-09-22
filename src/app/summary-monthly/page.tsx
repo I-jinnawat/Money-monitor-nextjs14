@@ -16,7 +16,7 @@ const Summary = () => {
         const getReport = async (month: string) => {
             setIsLoading(true); // Reset loading state on month change
             try {
-                const res = await fetch(`https://money-monitor-nextjs14.vercel.app/api/report?month=${month}`)
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/report?month=${month}`)
                 if (!res.ok) {
                     throw new Error("Failed to fetch report")
                 }
